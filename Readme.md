@@ -107,14 +107,3 @@ A simple car dodging game where the player controls a car using the keyboard to 
 5. **Testing and Refinement:**
     - Test the game for responsiveness and smooth gameplay.
     - Make adjustments to game difficulty and visual appeal.
-
-## Getting Started
-
-1. **Clone the Repository:**
-    ```bash
-    git clone https://github.com/yourusername/car-dodging-game.git
-    cd car-dodging-game
-    ```
-
-2. **Open the Game:**
-    - Open `index.html` in your web browser to start playing the game.
