@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="shortcut icon" href="./images/square icon logo.png" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Score</title>
+  <link rel="stylesheet" href="./stylesheet/style-score.css">
+</head>
+<body>
+  <div class="overlay">
+    <div class="score">
+      <b>CURRENT SCORE: </b> <span id="your-score">0</span>
+    </div>
+    <div class="highscore">
+      <b>HIGHSCORE: </b><span id="high-score">0</span>
+    </div>
+    <button class="replay-btn" onclick="replayGame()">🔁 REPLAY 🔁</button>
+    <a href="./index.html"><button class="exit-btn">❌ EXIT ❌</button></a>
+
+    <audio id="bgMusic" loop>
+      <source src="./sounds/demoness-stalks-her-prey-beat-80-bpm.wav" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
+
+    <script>
+      document.getElementById("bgMusic").play();
+
+      function replayGame() {
+        window.location.href = './index.html?replay=true';
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const score = urlParams.get("score");
+      const highScore = urlParams.get("highScore");
+
+      // Display score and high score
+      document.getElementById("your-score").innerText = score;
+      document.getElementById("high-score").innerText = highScore;
+    </script>
+  </div>
+</body>
+</html>
