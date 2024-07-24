@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traffic Terror</title>
+<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        font-family: 'Lobster', cursive;
+    }
+    .game{
+        background-image: url(bgImg.jpg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+    }
+    .hide {
+        display: none;
+    }
+    .startScreen {
+        width: 500px;
+        height: 107px;
+        line-height: 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+        margin: auto;
+        background-color: rgb(43, 205, 226);
+        text-align: center;
+        border-bottom: 2px solid rgb(132, 197, 197);
+        border: 2px solid black;
+        border-radius: 10px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    .score,
+    .highScore {
+        position: fixed; /* Fixed position to keep it always visible */
+        top: 10px;
+        text-align: center;
+        background-color: rgb(13 110 253 / 14%);
+        width: 200px;
+        color: #ef3fe0d9;
+        line-height: 40px;
+        border-radius: 4px;
+        border: 2px solid black;
+        font-size: 1.5em;
+        z-index: 3; /* Ensure it's above other content */
+    }
+    .score {
+        left: 20px; /* Position score on the left side */
+    }
+    .highScore {
+        left: calc(100% - 220px); /* Position high score on the right side */
+    }
+    .ClickToStart {
+        cursor: pointer;
+    }
+    .gameArea {
+        height: 100vh;
+        width: 400px;
+        margin: auto;
+        position: relative;
+        background-color: rgb(32, 32, 32);
+        overflow: hidden;
+        border-left: 4px dashed white;
+        border-right: 4px dashed white;
+    }
+    .car{
+        background: url(car1000.png);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        height: 75px;
+        width: 50px;
+        position: absolute;
+        top: 520px;
+    }
+    .Opponents {
+        background: url(car2000\ -\ Copy.png);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        height: 75px;
+        width: 50px;
+        position: absolute;
+        top: 520px;
+    }
+    .roadLines {
+        height: 100px;
+        width: 10px;
+        background-color: white;
+        position: absolute;
+        margin-left: 195px;
+    }
+</style>
+</head>
+<body>
+<div class="game">
+<div class="score"></div>
+<div class="highScore"></div>
+<div class="startScreen">
+<p class="ClickToStart">Click here to start the game <br><br></p>
+<p> INSTRUCTIONS: <br>
+Use Arrow keys to move the car <br>
+If you hit any car then game will end</p>
+</div>
+<div class="gameArea"></div>
+</div>
+  <!-- Before Start Music -->
+  <audio id="bsMusic" loop autoplay>
+    <source src="./sounds/Before start - light-mister-intro.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Background Music of entire game -->
+  <audio id="bgMusic" loop>
+    <source src="./sounds/8-bit-racing-car-[AudioTrimmer.com].wav" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Sound Effects -->
+  <audio id="startSound">
+    <source src="./sounds/start.wav" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- collision sound -->
+  <audio id="collisionSound">
+    <source src="./sounds/blast.wav" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+<script>
+const score = document.querySelector('.score');
+const highScore = document.querySelector('.highScore');
+const startScreen = document.querySelector('.startScreen');
+const gameArea = document.querySelector('.gameArea');
+const beforeStartMusic = document.getElementById('bsMusic');
+const backgroundMusic = document.getElementById('bgMusic');
+const startSound = document.getElementById('startSound');
+const collisionSound = document.getElementById('collisionSound');
+
+document.addEventListener('DOMContentLoaded', Start);
+document.addEventListener('keydown', keydown);
+document.addEventListener('keyup', keyup);
+
+let keys = {
+  ArrowUp: false,
+  ArrowDown: false,
+  ArrowLeft: false,
+  ArrowRight: false,
+}
+
+let player = {
+  speed: 5,
+  score: 0,
+  highScore: 0,
+  isStart: false,
+  hasStarted: false // New flag to track if the game has started
+};
+
+function keydown(e) {
+  keys[e.key] = true;
+}
+
+function keyup(e) {
+  keys[e.key] = false;
+}
+
+function Start() {
+  // Check for replay flag
+  const urlParams = new URLSearchParams(window.location.search);
+  const isReplay = urlParams.get("replay");
+
+  // Hide the start screen and start the game if it's a replay
+  if (isReplay) {
+    startScreen.classList.add('hide');
+    startGame();
+  } else {
+    startScreen.addEventListener('click', () => {
+      if (!player.hasStarted) {
+        startGame();
+      }
+    });
+  }
+}
+
+function startGame() {
+  player.hasStarted = true; // Set the flag to true when the game starts
+  startScreen.classList.add('hide');
+  gameArea.innerHTML = "";
+  player.isStart = true;
+  player.score = 0;
+  player.speed = 5; // Reset speed on start
+
+  // Retrieve high score from local storage
+  player.highScore = localStorage.getItem('highScore') || 0;
+  highScore.innerHTML = "HighScore: " + player.highScore;
+
+  // Play sounds on game start
+  beforeStartMusic.pause(); // Pause before start music
+  backgroundMusic.play(); // Play the background music
+  startSound.play(); // Play start sound
+
+  window.requestAnimationFrame(Play);
+
+  // creating the road lines
+  for (let i = 0; i < 5; i++) {
+    let roadLines = document.createElement('div');
+    roadLines.setAttribute('class', 'roadLines');
+    roadLines.y = (i * 140);
+    roadLines.style.top = roadLines.y + "px";
+    gameArea.appendChild(roadLines);
+  }
+
+  // creating the opponents car
+  for (let i = 0; i < 3; i++) {
+    let Opponents = document.createElement('div');
+    Opponents.setAttribute('class', 'Opponents');
+    Opponents.y = ((i) * -300);
+    Opponents.style.top = Opponents.y + "px";
+    gameArea.appendChild(Opponents);
+    Opponents.style.left = Math.floor(Math.random() * 350) + "px";
+    Opponents.style.backgroundColor = randomColor();
+  }
+
+  let car = document.createElement('div');
+  car.setAttribute('class', 'car');
+  gameArea.appendChild(car);
+  player.x = car.offsetLeft;
+  player.y = car.offsetTop;
+}
+
+function randomColor() {
+  function c() {
+    let hex = Math.floor(Math.random() * 256).toString(16);
+    return ("0" + String(hex)).substr(-2);
+  }
+  return "#" + c() + c() + c();
+}
+
+//play the game
+function Play() {
+  let car = document.querySelector('.car');
+  let road = gameArea.getBoundingClientRect();
+  if (player.isStart) {
+    moveLines();
+    moveOpponents(car);
+
+    if (keys.ArrowUp && player.y > (road.top + 70)) { player.y -= player.speed }
+    if (keys.ArrowDown && player.y < (road.height - 75)) { player.y += player.speed }
+    if (keys.ArrowRight && player.x < 350) { player.x += player.speed }
+    if (keys.ArrowLeft && player.x > 0) { player.x -= player.speed }
+
+    car.style.top = player.y + "px";
+    car.style.left = player.x + "px";
+
+    player.score++;
+    // Gradually increase speed at intervals defined by score
+    if (player.score % 200 === 0) {
+      player.speed += 1;
+    }
+    if (player.highScore < player.score) {
+      player.highScore = player.score;
+      highScore.innerHTML = "HighScore: " + player.highScore;
+      // Save high score to local storage
+      localStorage.setItem('highScore', player.highScore);
+    }
+    score.innerHTML = "Score: " + player.score;
+
+    window.requestAnimationFrame(Play);
+  }
+}
+
+function moveLines() {
+  let roadLines = document.querySelectorAll('.roadLines');
+  roadLines.forEach(function (item) {
+    if (item.y >= 700)
+      item.y -= 700;
+    item.y += player.speed;
+    item.style.top = item.y + "px";
+  })
+}
+
+function moveOpponents(car) {
+  let Opponents = document.querySelectorAll('.Opponents');
+  Opponents.forEach(function (item) {
+    if (isCollide(car, item)) {
+      collisionSound.play(); // Play collision sound
+      showCollisionImage(car); // Show collision image
+      endGame();
+    }
+    if (item.y >= 750) {
+      item.y -= 900;
+      item.style.left = Math.floor(Math.random() * 350) + "px";
+    }
+    item.y += player.speed;
+    item.style.top = item.y + "px";
+  })
+}
+
+//check whether the cars collide or not
+function isCollide(a, b) {
+  aRect = a.getBoundingClientRect();
+  bRect = b.getBoundingClientRect();
+  return !((aRect.top > bRect.bottom) || (aRect.bottom < bRect.top) || (aRect.right < bRect.left) || (aRect.left > bRect.right))
+}
+
+function showCollisionImage(car) {
+  car.style.backgroundImage = "url('./images/blast.png')";
+}
+
+//game is end
+function endGame() {
+  player.isStart = false;
+  backgroundMusic.pause(); // Pause background music
+  collisionSound.play(); // Play collision sound
+  // Save high score to local storage
+  localStorage.setItem('highScore', player.highScore);
+  setTimeout(() => {
+    window.location.href = 'gameover.html?score=' + player.score + '&highScore=' + player.highScore; // Redirect to gameover.html with scores
+  }, 1000); // Delay the redirect to let the collision sound play
+}
+</script>
+</body>
+</html>

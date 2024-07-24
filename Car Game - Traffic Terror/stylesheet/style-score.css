@@ -1,0 +1,52 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    background-image: url("../images/crash-gameover.jpg");
+    background-size: cover;
+    background-position: center;
+    font-family: Arial, sans-serif;
+    color: white;
+  }
+
+  .overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .score,
+  .highscore {
+    -webkit-text-stroke: 0.5px black;
+  }
+  .score {
+    font-size: 36px;
+    margin-top: 20px;
+  }
+
+  .highscore {
+    font-size: 24px;
+    margin-top: 10px;
+  }
+
+  .replay-btn,
+  .exit-btn {
+    margin-top: 30px;
+    padding: 8px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: 2px solid;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: background-color 0.3s;
+  }
+
+  .replay-btn:hover,
+  .exit-btn:hover {
+    background-color: #0056b3;
+  }
